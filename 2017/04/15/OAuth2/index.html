@@ -1,0 +1,775 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="OAuth," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言这是OAuth2.0系列文档的第二章，关于OAuth系列会将官方的文档都翻译完毕，希望在自己学习的同时可以帮助有需要的同学。
+2.客户端注册在启动协议之前，客户端需要注册到授权服务器。客户端注册到授权服务器的方式是超出本规范的范围的，但是涉及到终端用户和HTML注册表单的交互。
+客户端注册不需要客户端和授权服务器之间直接交互，只要授权服务器支持，注册就可以依赖别的方式来建立可信和获取需要的客户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OAuth文档(2)——客户端注册">
+<meta property="og:url" content="http://yoursite.com/2017/04/15/OAuth2/index.html">
+<meta property="og:site_name" content="个人小结">
+<meta property="og:description" content="前言这是OAuth2.0系列文档的第二章，关于OAuth系列会将官方的文档都翻译完毕，希望在自己学习的同时可以帮助有需要的同学。
+2.客户端注册在启动协议之前，客户端需要注册到授权服务器。客户端注册到授权服务器的方式是超出本规范的范围的，但是涉及到终端用户和HTML注册表单的交互。
+客户端注册不需要客户端和授权服务器之间直接交互，只要授权服务器支持，注册就可以依赖别的方式来建立可信和获取需要的客户">
+<meta property="og:updated_time" content="2017-04-15T16:35:43.964Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OAuth文档(2)——客户端注册">
+<meta name="twitter:description" content="前言这是OAuth2.0系列文档的第二章，关于OAuth系列会将官方的文档都翻译完毕，希望在自己学习的同时可以帮助有需要的同学。
+2.客户端注册在启动协议之前，客户端需要注册到授权服务器。客户端注册到授权服务器的方式是超出本规范的范围的，但是涉及到终端用户和HTML注册表单的交互。
+客户端注册不需要客户端和授权服务器之间直接交互，只要授权服务器支持，注册就可以依赖别的方式来建立可信和获取需要的客户">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/15/OAuth2/"/>
+
+
+
+
+
+  <title> OAuth文档(2)——客户端注册 | 个人小结 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?5e30a10c9f167b5bc8ca5671d204f450";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人小结</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/15/OAuth2/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="lijiwen">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/6695323?v=3&u=7b09dd4f5a7c1488ab8ff262a6981116ae758c89&s=400">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="个人小结">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="个人小结" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                OAuth文档(2)——客户端注册
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-15T23:01:13+08:00">
+                2017-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/OAuth/" itemprop="url" rel="index">
+                    <span itemprop="name">OAuth</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <a href="/2017/04/15/OAuth2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/15/OAuth2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这是OAuth2.0系列文档的第二章，关于OAuth系列会将官方的文档都翻译完毕，希望在自己学习的同时可以帮助有需要的同学。</p>
+<h1 id="2-客户端注册"><a href="#2-客户端注册" class="headerlink" title="2.客户端注册"></a>2.客户端注册</h1><p>在启动协议之前，客户端需要注册到授权服务器。客户端注册到授权服务器的方式是超出本规范的范围的，但是涉及到终端用户和HTML注册表单的交互。</p>
+<p>客户端注册不需要客户端和授权服务器之间直接交互，只要授权服务器支持，注册就可以依赖别的方式来建立可信和获取需要的客户端属性(例如，重定向URL，客户端类型)。例如，注册可以使用自分发或者第三方分发的断言来完成注册，或者通过授权服务器使用可信通道来执行客户端发现。</p>
+<p>当注册一个客户端时，客户端开发者应该：</p>
+<ul>
+<li><p>指定客户端类型，就像第2.1章节中描述的一样。</p>
+</li>
+<li><p>提供客户端的重定向URL</p>
+</li>
+<li><p>包含其他授权服务器需要的信息（例如，程序名称，网站，描述，logo图片，接受合法条款）</p>
+</li>
+</ul>
+<h2 id="2-1客户端类型"><a href="#2-1客户端类型" class="headerlink" title="2.1客户端类型"></a>2.1客户端类型</h2><p>OAuth定义了两种客户端类型，这种定义是建立在他们与授权服务器安全的进行身份认证的能力的基础上的（例如，保存客户端认证凭据机密性的能力）。</p>
+<ul>
+<li>机密的</li>
+</ul>
+<p>客户端能够保持他们认证凭据的机密性（例如，客户端建立在安全服务器上，安全服务器会限制对他们的认证凭据的访问），或者能够使用其他方式进行安全的客户端身份认证。</p>
+<ul>
+<li>公开的</li>
+</ul>
+<p>客户端不能够保持他们的认证凭据的机密性(例如，客户端在用户使用的设备上运行，例如：一个安装的本地应用或者一个基于浏览器的应用)，并且不能使用其他任何方式来进行安全的客户端安全地身份认证。</p>
+<p>客户端类型的设计是根据授权服务器对于安全身份认证的定义和它可以接受的客户端认证凭据的暴露等级来决定的。授权服务器不应该猜测客户端类型。</p>
+<p>一个客户端可能分布在一个分布式的组件上，所有的客户端类型不都一样，如果授权服务器没有对这种客户端的支持，或者没有提供关于注册的指导，客户端应该分别注册每个组件作为一个单独的客户端。</p>
+<p>该规范围绕以下客户端配置来设计：</p>
+<ul>
+<li>WEB应用</li>
+</ul>
+<p>一个WEB应用是运行在web服务器上的机密的客户端。资源拥有者通过使用自己设备的浏览器来访问客户端。客户端认证凭据和分发给客户端的访问令牌都存储在web服务器上，并且不会被资源拥有者接触到。</p>
+<ul>
+<li>基于用户代理的应用</li>
+</ul>
+<p>一个基于用户代理的应用是公开的客户端，客户端代码会从web服务器上下载下来，并且在用户设备上的代理（例如，浏览器）中运行。协议数据和用户认证凭据会被用户轻松获取到。因为这样的应用驻留在用户代理中，他们可以在进行请求授权的时候，完美利用用户代理的能力。</p>
+<ul>
+<li>本地应用</li>
+</ul>
+<p>本地应用是公开的客户端，他们安装并且运行在用户持有的设备上。协议数据和认证凭据可以被用户得到。假设认为程序中的客户端认证凭据都可以被提取出来。另一方面，动态分发的凭据例如访问令牌或者更新令牌可以接收一个可以接收级别的保护。最低限度，这些凭据可以被保护不受与之交互的敌对服务器的侵袭。在一些平台，这些凭据可能被保护不受在同一设备的其他应用的侵袭。</p>
+<h2 id="2-2-客户端身份标识"><a href="#2-2-客户端身份标识" class="headerlink" title="2.2 客户端身份标识"></a>2.2 客户端身份标识</h2><p>授权服务器分发给注册的客户端一个身份标识——一个代表客户端注册信息的唯一的字符串。客户端身份标识不是保密的；这是暴露给资源拥有者的，并且一定不能单独用来客户端认证。对于授权服务器而言，客户端用户标识是唯一的。</p>
+<p>客户端身份标识字符串长度在该规范中尚未定义。客户端应该避免对身份标识的长度做出假设。授权服务器应该记录任何它分发的标识的长度。</p>
+<h2 id="2-3客户端认证"><a href="#2-3客户端认证" class="headerlink" title="2.3客户端认证"></a>2.3客户端认证</h2><p>如果客户端类型是机密类型，客户端和授权服务器建立一个满足授权服务器安全需求的客户端认证方案。授权服务器可能接受任何形式的客户端认证来满足其安全需求。</p>
+<p>机密型客户端通常会被分发一系列的用于向授权服务器进行验证的客户端凭据（例如，密码，公/私钥对）。</p>
+<p>授权服务器可能会建立一个和公开型客户端进行客户端认证的方法。但是授权服务器必须不能依赖公开型客户端认证来识别客户端。</p>
+<p>客户端一定不能在一次请求中使用多种认证方案。</p>
+<h3 id="2-3-1客户端密码"><a href="#2-3-1客户端密码" class="headerlink" title="2.3.1客户端密码"></a>2.3.1客户端密码</h3><p>拥有一个客户端密码的客户端可能会使用HTTP Basic认证模式来进行身份认证，详细参见<a href="https://tools.ietf.org/html/rfc2617" target="_blank" rel="external">RFC2617</a>。客户端身份标识使用<code>application/x-www-form-urlencoded</code>按照<a href="https://tools.ietf.org/html/rfc6749#appendix-B" target="_blank" rel="external">附录B</a>的编码算法进行编码，并且编码后的值用来作为用户名；客户端密码使用同样的算法进行编码，并且编码后作为密码。授权服务器必须支持HTTP Basic认证模式，用来对被分发密码的客户端进行认证。</p>
+<p>举例如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3</div></pre></td></tr></table></figure>
+<p>另外，授权服务器可能支持使用以下参数在请求体内包含客户端认证凭据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">client_id</div></pre></td></tr></table></figure>
+<p>必须。在注册过程中分发给客户端的客户端身份标识</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">client_secret</div></pre></td></tr></table></figure>
+<p>必须，客户端密码。如果客户端面是一个空值的话，客户端可能省略该参数。</p>
+<p>使用两个参数将客户端凭据封装到请求体中是不被推荐使用，并且应该限制客户端直接使用HTTP Basic认证模式（或者其他的基于密码的HTTP认证模式）。参数可以智能通过请求体进行传输，并且一定不可以放在URL中。</p>
+<p>例如，一个使用请求体来请求更新访问令牌的请求：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">POST /token HTTP/1.1</div><div class="line">Host: server.example.com</div><div class="line">Content-Type: application/x-www-form-urlencoded</div><div class="line"></div><div class="line">grant_type=refresh_token&amp;refresh_token=tGzv3JOkF0XG5Qx2TlKWIA</div><div class="line">&amp;client_id=s6BhdRkqt3&amp;client_secret=7Fjfp0ZBr1KtDRbnfVdmIw</div></pre></td></tr></table></figure>
+<p>授权服务器在使用密码认证发送请求的时候必须需要使用TLS协议。</p>
+<p>因为这个客户端认证方法涉及到一个密码，授权服务器必须保护任何终端使用它免受暴力攻击。</p>
+<h3 id="2-3-2其他认证方法"><a href="#2-3-2其他认证方法" class="headerlink" title="2.3.2其他认证方法"></a>2.3.2其他认证方法</h3><p>认证服务器可能支持任何符合其安全需求的HTTP认证模式。当使用其他认证方法时，授权服务器必须定义一个客户端身份标识符和认证模式之间的映射。</p>
+<h2 id="2-4未注册的客户端"><a href="#2-4未注册的客户端" class="headerlink" title="2.4未注册的客户端"></a>2.4未注册的客户端</h2><p>该规范没有包含对没注册客户端的使用。但是，对于这种客户端的时候超出了该规范的范围，并且需要额外的安全分析审视交互带来的影响。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OAuth/" rel="tag"># OAuth</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/14/OAuth2-0-1/" rel="next" title="OAuth2.0文档(1)——介绍">
+                <i class="fa fa-chevron-left"></i> OAuth2.0文档(1)——介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/04/15/OAuth2/"
+           data-title="OAuth文档(2)——客户端注册" data-url="http://yoursite.com/2017/04/15/OAuth2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://avatars0.githubusercontent.com/u/6695323?v=3&u=7b09dd4f5a7c1488ab8ff262a6981116ae758c89&s=400"
+               alt="lijiwen" />
+          <p class="site-author-name" itemprop="name">lijiwen</p>
+          <p class="site-description motion-element" itemprop="description">这个站有大问题</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-客户端注册"><span class="nav-number">2.</span> <span class="nav-text">2.客户端注册</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1客户端类型"><span class="nav-number">2.1.</span> <span class="nav-text">2.1客户端类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-客户端身份标识"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 客户端身份标识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3客户端认证"><span class="nav-number">2.3.</span> <span class="nav-text">2.3客户端认证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1客户端密码"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1客户端密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2其他认证方法"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2其他认证方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4未注册的客户端"><span class="nav-number">2.4.</span> <span class="nav-text">2.4未注册的客户端</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lijiwen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lijiwen"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
